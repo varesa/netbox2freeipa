@@ -21,6 +21,15 @@ def get_zones(ipa):
     return [zone['idnsname'][0] for zone in reply['result']['result']]
 
 
+zone_records_cache = {}
+
+
+def get_zone_records(ipa, zone):
+    if zone not in zone_records_cache.keys():
+        zone_records_cache[zone] = ipa.dnsrecord_find(zone)['result']['result']
+    return zone_records_cache[zone]
+
+
 def get_addresses(nb):
     addresses = getattr(nb.ipam, 'ip-addresses').all()
     for record in addresses:
@@ -108,7 +117,7 @@ def get_host(fqdn, zone):
 
 
 for zone in zones:
-    records = ipa.dnsrecord_find(zone)['result']['result']
+    records = get_zone_records(ipa, zone)
 
     for rec_zone, rec_name, rec_ip in a_records:
         if rec_zone != zone:
@@ -141,7 +150,7 @@ for rec_ip, rec_name in ptr_records:
         recordname = '.'.join(recordname_segments)
 
         # print(rec_ip, recordname, zone_match)
-        records = ipa.dnsrecord_find(zone_match)['result']['result']
+        records = get_zone_records(ipa, zone_match)
         for record in records:
             if record['idnsname'][0] == recordname:
                 # print("Exists: ", rec_name, rec_ip, "-", recordname, zone_match)

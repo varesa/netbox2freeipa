@@ -1,7 +1,9 @@
 import ipahttp
 import json
-import subprocess
 import pynetbox
+import random
+import string
+import subprocess
 
 ipa = ipahttp.ipa('ipa.tre.esav.fi', sslverify=True)
 ipa.login(
@@ -11,7 +13,7 @@ ipa.login(
 
 
 nb = pynetbox.api(
-    'http://netbox-apps.os.tre.esav.fi/', 
+    'http://netbox-apps.os.tre.esav.fi/',
     token=subprocess.check_output(['secret-tool', 'lookup', 'token', 'autom_netbox2ipa']).decode()
 )
 
@@ -31,6 +33,13 @@ def get_addresses(nb):
             "description": str(record.description),
         }
 
-#print((get_zones(ipa)))
-print(json.dumps(list(get_addresses(nb))))
 
+# print((get_zones(ipa)))
+# print(json.dumps(list(get_addresses(nb))))
+
+rand = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+
+r = ipa.dnsrecord_add('my.zone', f"automation-test-{rand}", {"arecord": ["2.3.4.5"]})
+print(json.dumps(r))
+
+print(json.dumps(ipa.dnsrecord_find('my.zone')))

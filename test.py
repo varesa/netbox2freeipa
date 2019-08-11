@@ -95,7 +95,7 @@ for address in get_addresses(nb):
         if not zone:
             continue
 
-        ptr_records.append((zone, name, ip,))
+        ptr_records.append((ip, name,))
 
 # print(a_records)
 # print(ptr_records)
@@ -121,3 +121,31 @@ for zone in zones:
         else:
             print(f"{host} in {zone} is missing a record. Creating now")
             ipa.dnsrecord_add(zone, host, {"arecord": [rec_ip]})
+
+for rec_ip, rec_name in ptr_records:
+    prefix_match = ""
+    zone_match = ""
+    for zone in zones:
+        if not zone.endswith('.in-addr.arpa.'):
+            continue
+        prefix_segments = reversed(zone.split('.')[:-3])
+        prefix = '.'.join(prefix_segments) + '.'
+
+        if rec_ip.startswith(prefix) and len(prefix) > len(prefix_match):
+            prefix_match = prefix
+            zone_match = zone
+
+    if zone_match:
+        # print(rec_ip, prefix_match, zone_match)
+        recordname_segments = reversed(rec_ip[len(prefix_match):].split('.'))
+        recordname = '.'.join(recordname_segments)
+
+        # print(rec_ip, recordname, zone_match)
+        records = ipa.dnsrecord_find(zone_match)['result']['result']
+        for record in records:
+            if record['idnsname'][0] == recordname:
+                # print("Exists: ", rec_name, rec_ip, "-", recordname, zone_match)
+                break
+        else:
+            print("Does not exist: ", rec_name, rec_ip, "-", recordname, zone_match, "- Creating now")
+            ipa.dnsrecord_add(zone_match, recordname, {"ptrrecord": [rec_name]})

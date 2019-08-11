@@ -1,0 +1,6 @@
+[submodule "python-freeipa-json"]
+	path = vendor/python-freeipa-json
+	url = git@github.com:varesa/python-freeipa-json.git
+[submodule "vendor/pynetbox"]
+	path = vendor/pynetbox
+	url = https://github.com/digitalocean/pynetbox

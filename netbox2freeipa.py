@@ -1,9 +1,11 @@
+#!/bin/env python3
+
 import ipahttp
 import pynetbox
 import re
 import subprocess
 
-ipa = ipahttp.ipa('ipa.tre.esav.fi', sslverify=True)
+ipa = ipahttp.ipa('treipa2.tre.esav.fi', sslverify=True)
 ipa.login(
     'autom_netbox2ipa',
     subprocess.check_output(['secret-tool', 'lookup', 'account', 'autom_netbox2ipa']).decode()

@@ -5,7 +5,7 @@ import pynetbox
 import re
 import subprocess
 
-ipa = ipahttp.ipa('treipa2.tre.esav.fi', sslverify=True)
+ipa = ipahttp.ipa('treipa2.tre.esav.fi', sslverify='/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem')
 ipa.login(
     'autom_netbox2ipa',
     subprocess.check_output(['secret-tool', 'lookup', 'account', 'autom_netbox2ipa']).decode()
